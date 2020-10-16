@@ -12,19 +12,19 @@ const transporter = nodemailer.createTransport({
    
 });
 
- /*  const mailOptions = {
-    from:'',
-    to:'',
-    subject:'',
-    text:'',
-    html:''
-} */
-  
+const setMailOptions = (email, userId, token) => {
+    return {
+        from: process.env.GOOGLE_ACCOUNT,
+        to: email,
+        subject: 'E-commerce app recovery password',
+        html: `<h1>Please click on this link</h1> <a href="http://localhost:3000/actualizar-contrasena?user=${userId}&token=${token}">Da click aquí para restablecer tu contraseña</a>`
+    }
+};
 
-const enviarCorreo=(obj)=>{
+const sendEmail=(email, userId, token)=>{
 
     return new Promise((resolve, reject)=>{
-        transporter.sendMail(obj,(error,info)=>{
+        transporter.sendMail(setMailOptions(email, userId, token),(error,info)=>{
             if(error){
                 reject(error.message);
             }else{
@@ -33,6 +33,7 @@ const enviarCorreo=(obj)=>{
         });
 
     })
-}
+};
 
-module.exports=enviarCorreo; 
+module.exports=sendEmail; 
+

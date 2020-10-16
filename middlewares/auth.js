@@ -2,19 +2,13 @@ const jwt = require('jsonwebtoken');
 
 
 const validateToken = (request, response, next) => {
-    //Middleware para validar el token del usuario
-    // token = request.headers
-    
-    const bearerHeader=request.headers['authorization']
-    console.log('AUTORIZACION',bearerHeader)
-    if(typeof bearerHeader !== "undefined"){
-        const authorization = bearerHeader.split(' ');
-        const token = authorization[1];
-        
+    //Middleware to validate the user's token
+    const token = request.cookies.access_token;
+    if(token){
         try {
             request['token'] = token;
             let decoded = jwt.verify(token, process.env.JWT_SECRET);
-            console.log('PAYLOAD ',decoded);
+            request['decoded'] = decoded;
             if(decoded){
                 next();
             }
@@ -22,11 +16,11 @@ const validateToken = (request, response, next) => {
             console.log(err);
             response.status(401).json({message: "The token is wrong"})
         }
-
     }else{
-        response.status(401).json({message: "The token hasn't been delivered"})
+        response.status(401).json({message: "The token has been delivered"})
     }
-    
 }
+
+
 
 module.exports = validateToken;
