@@ -2,6 +2,7 @@ const express = require('express');
 const {addUser,
     findUsers,
     findById,
+    searchUserByPage,
     deleteUser,
     updateUser,
     me,} = require('../controllers/users');
@@ -13,6 +14,7 @@ const validateToken = require('../middlewares/auth');
 router.post('/api/v1/users', validateToken, addUser);
 // GET
 router.get('/api/v1/users', findUsers);
+router.get('/api/v1/users/search', searchUserByPage);
 router.get('/api/v1/users/:id', validateToken, findById);
 router.get('/api/v1/users/me', me);
 // DELETE

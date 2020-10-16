@@ -3,6 +3,7 @@ const express = require('express');
 const {addSale_Order,
     findSale_Order,
     findSale_OrderById,
+    searchSalesOrderByPage,
     deleteSale_Order,
     updateSale_Order
     } = require('../controllers/sales_orders');
@@ -14,6 +15,7 @@ const validateToken = require('../middlewares/auth');
 router.post('/api/v1/sales_orders', validateToken, addSale_Order);
 // GET
 router.get('/api/v1/sales_orders', findSale_Order);
+router.get('/api/v1/sales_orders/search', searchSalesOrderByPage);
 router.get('/api/v1/sales_orders/:id', validateToken, findSale_OrderById);
 
 // DELETE

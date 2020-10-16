@@ -3,6 +3,7 @@ const express = require('express');
 const {addProduct,
     findProduct,
     findProductById,
+    searchProductByPage,
     deleteProduct,
     updateProduct
     } = require('../controllers/products');
@@ -14,6 +15,7 @@ const validateToken = require('../middlewares/auth');
 router.post('/api/v1/products', validateToken, addProduct);
 // GET
 router.get('/api/v1/products', findProduct);
+router.get('/api/v1/products/search', searchProductByPage);
 router.get('/api/v1/products/:id', validateToken, findProductById);
 
 // DELETE

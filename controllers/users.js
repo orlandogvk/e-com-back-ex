@@ -17,6 +17,25 @@ const findById = async (request, response) => {
     response.json(users)
 };
 
+const searchUserByPage=async(request,response)=>{
+    const limit = request.query.limit;
+    const page = request.query.page;
+    
+     //Offset se refiere al numero de registros que excluiremos de la consulta
+     const users = await Users.findAndCountAll({
+        offset: limit * (page - 1),
+        limit: limit,
+    })
+
+    const pages=Math.ceil(users.count/limit);
+
+    let nextPage=page<pages?page+1:pages
+    let prevPage=page>1?page-1:1
+
+    response.json({nextPage, prevPage, pages: pages, results: users })
+
+};
+
 //Generating short token
 const generateToken = (length) => {
         var result = '';
@@ -127,6 +146,7 @@ module.exports = {
     addUser,
     findUsers,
     findById,
+    searchUserByPage,
     deleteUser,
     updateUser,
     me
