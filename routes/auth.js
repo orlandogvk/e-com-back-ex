@@ -11,3 +11,4 @@ router.post('/api/v1/users/reset-password', resetPassword);
 
 //Export default
 module.exports = router;
+

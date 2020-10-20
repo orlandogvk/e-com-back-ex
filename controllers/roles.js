@@ -1,21 +1,42 @@
 
-const {Roles} = require('../models');
+const { Roles } = require('../models');
 
 
 
 const findRole = async (request, response) => {
-    const role = await Roles.findAll();
-    response.json({ results: role })
+    try {
+
+        const role = await Roles.findAll();
+        response.json({ results: role })
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The roles can't be found" })
+    }
+
 };
 
 const findRoleById = async (request, response) => {
+
     const roleId = request.params.id;
-    const roles = await Roles.findOne({
-        where: {
-            id: roleId
-        }
-    });
-    response.json(roles)
+    try {
+
+        const roles = await Roles.findOne({
+            where: {
+                id: roleId
+            }
+        });
+        response.json(roles)
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The role can't be dound" })
+    }
+
 };
 
 const addRole = async (request, response) => {
@@ -24,19 +45,25 @@ const addRole = async (request, response) => {
         name
     } = request.body;
 
+    try {
 
-    const role = await Roles.create({
-        name,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "It has added the role successfully", role })
+        const role = await Roles.create({
+            name
+        })
+
+        response.json({ message: "It has added the role successfully", role })
+    } catch (error) {
+        console.log(error)
+        response
+            .status(400)
+            .json({ message: "The role has been created" })
+    }
+
 };
 
-const updateRole =async (request, response) => {
+const updateRole = async (request, response) => {
     let roleId = request.params.id;
- 
+
     let {
         name
     } = request.body;
@@ -49,7 +76,7 @@ const updateRole =async (request, response) => {
             where: {
                 id: roleId
             }
-        }); 
+        });
         const role = roles[1][0].dataValues;
         response.json(role);
     } catch (error) {
@@ -61,11 +88,22 @@ const updateRole =async (request, response) => {
 
 const deleteRole = async (request, response) => {
     let roleId = request.params.id;
-    let role = await Roles.destroy({where: {id: roleId}});
-    response.json({
-        message: "The role been deleted succesfully",
-        role
-    });
+
+    try {
+
+        let role = await Roles.destroy({ where: { id: roleId } });
+        response.json({
+            message: "The role been deleted succesfully",
+            role
+        });
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The Role has been deleted" })
+    }
+
 };
 
 

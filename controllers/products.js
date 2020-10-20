@@ -1,27 +1,62 @@
 
-const {Products} = require('../models');
-
-
-
+const {Products,Product_Statuses,Categories,Tags} = require('../models');
 
 
 const findProduct = async (request, response) => {
-    const product = await Products.findAll();
-    response.json({ results: product })
-};
+    try { 
+        const products = await Products.findAll({
+            include: [
+                {
+                    model: Product_Statuses,
+                    as: 'Product_Statuses',
+                    // attributes: { exclude: ['id', 'createdAt', 'updatedAt'] }
+                    attributes: ['id', 'name']
+                },{
+                    model: Categories,
+                    as: 'Categories',
+                    attributes: ['id', 'name']
+                },{
+                    model: Tags,
+                    as: 'Tags',
+                    attributes: ['id', 'name']
+                }
+
+            ]
+        });
+        response.json({ results: products });
+    }
+    catch(error){
+        console.log(error);
+        response
+            .status(400)
+            .json({message: "Error to get the products"});
+
+    }
+};  
 
 const findProductById = async (request, response) => {
-    const productId = request.params.id;
-    const products = await Products.findOne({
-        where: {
-            id: productId
-        }
-    });
-    response.json(products)
+    try {
+        const productId = request.params.id;
+        const products = await Products.findOne({
+            where: {
+                id: productId
+            }
+        });
+        response.json(products)
+    }
+    catch(error){
+        console.log(error);
+        response
+            .status(400)
+            .json({message: "Error to get the product"});
+    }
+   
 };
 
 const searchProductByPage=async(request,response)=>{
-    const limit = request.query.limit;
+    try {
+
+        const limit = request.query.limit;
     const page = request.query.page;
     
      //Offset se refiere al numero de registros que excluiremos de la consulta
@@ -37,8 +72,16 @@ const searchProductByPage=async(request,response)=>{
 
     response.json({nextPage, prevPage, pages: pages, results: products })
 
-};
+    }catch(error){
+        console.log(error);
+        response
+            .status(400)
+            .json({message: "Error to get the page"});
 
+    }
+    
+
+};
 
 const addProduct = async (request, response) => {
 
@@ -53,26 +96,35 @@ const addProduct = async (request, response) => {
         taxable
     } = request.body;
 
+    try {
 
-    const product = await Products.create({
-        sku,
-        name,
-        description,
-        product_status_id,
-        regular_price,
-        discount_price,
-        quantity,
-        taxable,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "The product has been added successfully", product })
+        const product = await Products.create({
+            sku,
+            name,
+            description,
+            product_status_id,
+            regular_price,
+            discount_price,
+            quantity,
+            taxable
+        })
+       
+        response.json({ message: "The product has been added successfully", product })
+
+    }catch(error){
+
+        console.log(error);
+        response
+            .status(400)
+            .json({message: "Error to create the product"});
+        
+    }
+    
 };
 
 const updateProduct =async (request, response) => {
+
     let productId = request.params.id;
- 
     let {
         sku,
         name,
@@ -82,7 +134,8 @@ const updateProduct =async (request, response) => {
         discount_price,
         quantity,
         taxable
-    } = request.body;
+    } = request.body; 
+    
     try {
         const products = await Products.update({
             sku,
@@ -110,12 +163,24 @@ const updateProduct =async (request, response) => {
 };
 
 const deleteProduct = async (request, response) => {
+
     let productId = request.params.id;
-    let product = await Products.destroy({where: {id: productId}});
-    response.json({
-        message: "The product has been deleted succesfully",
-        product
-    });
+
+    try {
+
+        let product = await Products.destroy({where: {id: productId}});
+        response.json({
+            message: "The product has been deleted succesfully",
+            product
+        });
+
+    }catch(error){
+        console.log(error);
+        response
+            .status(400)
+            .json({message: "Error to delete the product"});
+    }
+   
 };
 
 // EXPORT
@@ -127,6 +192,5 @@ module.exports = {
     deleteProduct,
     updateProduct
 }
-
 
 

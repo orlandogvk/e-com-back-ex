@@ -1,24 +1,49 @@
 
-const {CC_Transactions} = require('../models');
+const { CC_Transactions, Sales_Orders } = require('../models');
 
 
 
 const findCC_Trans = async (request, response) => {
-    const ccTrans = await CC_Transactions.findAll();
-    response.json({ results: ccTrans })
+    try {
+        const ccTrans = await CC_Transactions.findAll({
+            model: Sales_Orders,
+            as: 'Sales_Orders',
+            attributes: ['id', 'order_date', 'total', 'coupon_id', 'session_id', 'user_id']
+        });
+        response.json({ results: ccTrans })
+
+    } catch (error) {
+        console.log(error);
+        console.log(error)
+        response
+            .status(400)
+            .json({ message: "The transactions has not been found" })
+    }
 };
 
 const findCC_TransById = async (request, response) => {
+
     const ccTransId = request.params.id;
-    const ccTrans = await CC_Transactions.findOne({
-        where: {
-            id: ccTransId
-        }
-    });
-    response.json(ccTrans)
+
+    try {
+        const ccTrans = await CC_Transactions.findOne({
+            where: {
+                id: ccTransId
+            }
+        });
+        response.json(ccTrans)
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The transaction has not found" })
+    }
+
+
 };
 
-const addCC_Trans = async (request, response) => {
+const addCC_Trans = async (req, res) => {
 
     let {
         code,
@@ -32,27 +57,33 @@ const addCC_Trans = async (request, response) => {
         response
     } = request.body;
 
+    try {
+        const cc_trans = await CC_Transactions.create({
+            code,
+            order_id,
+            transdate,
+            processor,
+            processor_trans_id,
+            amount,
+            cc_num,
+            cc_type,
+            response
+        })
 
-    const cc_trans = await CC_Transactions.create({
-        code,
-        order_id,
-        transdate,
-        processor,
-        processor_trans_id,
-        amount,
-        cc_num,
-        cc_type,
-        response,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "The transaction has been added successfully", cc_trans })
+        res.json({ message: "The transaction has been added successfully", cc_trans })
+
+    } catch (error) {
+        console.log(error);
+        res
+            .status(400)
+            .json({ message: "The transaction has not been created" });
+    }
+
 };
 
-const updateCC_Trans =async (request, response) => {
-    let ccTransId = request.params.id;
- 
+const updateCC_Trans = async (req, res) => {
+    let ccTransId = req.params.id;
+
     let {
         code,
         order_id,
@@ -63,7 +94,7 @@ const updateCC_Trans =async (request, response) => {
         cc_num,
         cc_type,
         response,
-    } = request.body;
+    } = req.body;
     try {
         const cc_transactions = await CC_Transactions.update({
             code,
@@ -81,23 +112,33 @@ const updateCC_Trans =async (request, response) => {
             where: {
                 id: ccTransId
             }
-        }); 
+        });
         const ccTrans = cc_transactions[1][0].dataValues;
-        response.json(ccTrans);
+        res.json(ccTrans);
     } catch (error) {
-        response
+        res
             .status(400)
             .json({ message: "The row has not updated correctly" });
     }
 };
 
 const deleteCC_Trans = async (request, response) => {
+
     let ccTransId = request.params.id;
-    let ccTrans = await CC_Transactions.destroy({where: {id: ccTransId}});
-    response.json({
-        message: "The transaction has been deleted succesfully",
-        ccTrans
-    });
+
+    try {
+        let ccTrans = await CC_Transactions.destroy({ where: { id: ccTransId } });
+        response.json({
+            message: "The transaction has been deleted succesfully",
+            ccTrans
+        });
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The transaction has not been deleted" })
+    }
+
 };
 
 

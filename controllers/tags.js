@@ -1,20 +1,39 @@
 
-const {Tags} = require('../models');
+const { Tags } = require('../models');
 
 
 const findTag = async (request, response) => {
-    const tag = await Tags.findAll();
-    response.json({ results: tag })
+    try {
+        const tag = await Tags.findAll();
+        response.json({ results: tag })
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "Error to get the tag" });
+    }
+
 };
 
 const findTagById = async (request, response) => {
+
     const tagId = request.params.id;
-    const tags = await Tags.findOne({
-        where: {
-            id: tagId
-        }
-    });
-    response.json(tags)
+
+    try {
+        const tags = await Tags.findOne({
+            where: {
+                id: tagId
+            }
+        });
+        response.json(tags)
+    }
+    catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "Error to find a tag" });
+    }
+
 };
 
 const addTag = async (request, response) => {
@@ -22,20 +41,25 @@ const addTag = async (request, response) => {
     let {
         name
     } = request.body;
+    try {
+        const tag = await Tags.create({
+            name
+        })
+        response.json({ message: "The tag was added successfully", tag });
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "Error to create the tag" });
+    }
 
 
-    const tag = await Tags.create({
-        name,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "The tag was added successfully", tag })
 };
 
-const updateTag =async (request, response) => {
+const updateTag = async (request, response) => {
     let tagId = request.params.id;
- 
+
     let {
         name
     } = request.body;
@@ -48,7 +72,7 @@ const updateTag =async (request, response) => {
             where: {
                 id: tagId
             }
-        }); 
+        });
         const tag = tags[1][0].dataValues;
         response.json(tag);
     } catch (error) {
@@ -59,12 +83,22 @@ const updateTag =async (request, response) => {
 };
 
 const deleteTag = async (request, response) => {
-    let tagId = request.params.id;
-    let tag = await Tags.destroy({where: {id: tagId}});
-    response.json({
-        message: "The tag has been deleted succesfully",
-        tag
-    });
+
+    try {
+
+        let tag = await Tags.destroy({ where: { id: tagId } });
+        response.json({
+            message: "The tag has been deleted succesfully",
+            tag
+        });
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The tag has not been deleted" })
+    }
+
 };
 
 

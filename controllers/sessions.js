@@ -1,21 +1,37 @@
 
-const {Sessions} = require('../models');
+const { Sessions } = require('../models');
 
 
 
 const findSession = async (request, response) => {
-    const session = await Sessions.findAll();
-    response.json({ results: session })
+    try {
+        const session = await Sessions.findAll();
+        response.json({ results: session })
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The session has not been found" })
+    }
 };
 
 const findSessionById = async (request, response) => {
+
     const sessionId = request.params.id;
-    const sessions = await Sessions.findOne({
-        where: {
-            id: sessionId
-        }
-    });
-    response.json(sessions)
+    try {
+        const sessions = await Sessions.findOne({
+            where: {
+                id: sessionId
+            }
+        });
+        response.json(sessions)
+    } catch (error) {
+        console.log(error)
+        response
+            .status(400)
+            .json({ message: "The sesion has not found" })
+    }
+
 };
 
 const addSession = async (request, response) => {
@@ -24,19 +40,24 @@ const addSession = async (request, response) => {
         data
     } = request.body;
 
+    try {
+        const session = await Sessions.create({
+            data
+        })
 
-    const session = await Sessions.create({
-        data,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "It has added the session successfully", session })
+        response.json({ message: "It has added the session successfully", session })
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The session hasn't added" })
+    }
 };
 
-const updateSession =async (request, response) => {
+const updateSession = async (request, response) => {
     let sessionId = request.params.id;
- 
+
     let {
         data
     } = request.body;
@@ -49,7 +70,7 @@ const updateSession =async (request, response) => {
             where: {
                 id: sessionId
             }
-        }); 
+        });
         const session = sessions[1][0].dataValues;
         response.json(session);
     } catch (error) {
@@ -60,12 +81,23 @@ const updateSession =async (request, response) => {
 };
 
 const deleteSession = async (request, response) => {
+
     let sessionId = request.params.id;
-    let session = await Sessions.destroy({where: {id: sessionId}});
-    response.json({
-        message: "The session has been deleted succesfully",
-        session
-    });
+
+    try {
+        let session = await Sessions.destroy({ where: { id: sessionId } });
+        response.json({
+            message: "The session has been deleted succesfully",
+            session
+        });
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The session has not deleted" })
+
+    }
+
 };
 
 

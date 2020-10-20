@@ -1,20 +1,42 @@
 
-const {Categories} = require('../models');
+const { Categories } = require('../models');
 
 
 const findCategory = async (request, response) => {
-    const categories = await Categories.findAll();
-    response.json({ results: categories })
+    try {
+        const categories = await Categories.findAll({
+            include: [{
+                model: Categories,
+                as: 'Categories'
+            }]
+        });
+        response.json({ results: categories })
+    }
+    catch (error) {
+        console.log(error);
+        response.status(400).json({ message: "Error to get the categories" });
+    }
+
 };
 
 const findCatById = async (request, response) => {
     const catId = request.params.id;
-    const categories = await Categories.findOne({
-        where: {
-            id: catId
-        }
-    });
-    response.json(categories)
+    try {
+        const categories = await Categories.findOne({
+            where: {
+                id: catId
+            }
+        });
+        response.json(categories)
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The category has not been found" })
+    }
+
+
 };
 
 const addCategory = async (request, response) => {
@@ -24,20 +46,25 @@ const addCategory = async (request, response) => {
         parent_id
     } = request.body;
 
+    try {
 
-    const category = await Categories.create({
-        name,
-        parent_id,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "The category has been added successfully", category })
+        const category = await Categories.create({
+            name,
+            parent_id
+        });
+        response.json({ message: "The category has been added successfully", category });
+
+    }
+    catch (error) {
+        console.log(error);
+        response.status(400).json({ message: "Error to create the category" });
+    }
+
 };
 
-const updateCategory =async (request, response) => {
+const updateCategory = async (request, response) => {
     let catId = request.params.id;
- 
+
     let {
         name,
         parent_id
@@ -52,7 +79,7 @@ const updateCategory =async (request, response) => {
             where: {
                 id: catId
             }
-        }); 
+        });
         const category = categories[1][0].dataValues;
         response.json(category);
     } catch (error) {
@@ -63,12 +90,23 @@ const updateCategory =async (request, response) => {
 };
 
 const deleteCategory = async (request, response) => {
+
     let catId = request.params.id;
-    let category = await Categories.destroy({where: {id: catId}});
-    response.json({
-        message: "The category has been deleted succesfully",
-        category
-    });
+    
+    try {
+        let category = await Categories.destroy({ where: { id: catId } });
+        response.json({
+            message: "The category has been deleted succesfully",
+            category
+        });
+
+    } catch (error) {
+        console.log(error);
+        response
+        .status(400)
+        .json({ message: "The category has not been deleted"})
+    }
+
 };
 
 

@@ -24,14 +24,21 @@ const addProduct_Stat = async (request, response) => {
         name
     } = request.body;
 
+    try {
+        const productStat = await Product_Statuses.create({
+            name
+        })
+       
+        response.json({ message: "The product status has been added successfully", productStat })
+    }
+    catch(error){
+        console.log(error);
+        response
+            .status(400)
+            .json({message: "Error to create the status"});
 
-    const productStat = await Product_Statuses.create({
-        name,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "The product status has been added successfully", productStat })
+    }
+    
 };
 
 const updateProduct_Stat =async (request, response) => {

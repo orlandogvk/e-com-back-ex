@@ -1,21 +1,39 @@
 
-const {Coupons} = require('../models');
+const { Coupons } = require('../models');
 
 
 
 const findCoupon = async (request, response) => {
-    const coupon = await Coupons.findAll();
-    response.json({ results: coupon })
+    try {
+        const coupon = await Coupons.findAll();
+        response.json({ results: coupon })
+
+    } catch (error) {
+        console.log(error)
+        response
+            .status(400)
+            .json({ message: "The coupons has not been found" })
+    }
+
 };
 
 const findCouponById = async (request, response) => {
     const couponId = request.params.id;
-    const coupon = await Coupons.findOne({
-        where: {
-            id: couponId
-        }
-    });
-    response.json(coupon)
+    try {
+        const coupon = await Coupons.findOne({
+            where: {
+                id: couponId
+            }
+        });
+        response.json(coupon)
+
+    } catch (error) {
+        console.log(error)
+        response
+            .status(400)
+            .json({ message: "The coupon has not been found" })
+    }
+
 };
 
 const addCoupon = async (request, response) => {
@@ -30,25 +48,32 @@ const addCoupon = async (request, response) => {
         end_date
     } = request.body;
 
+    try {
 
-    const coupon = await Coupons.create({
-        code,
-        description,
-        active,
-        value,
-        multiple,
-        start_date,
-        end_date,
-        created_at: new Date(),
-        updated_at: new Date()
-    })
-   
-    response.json({ message: "The coupon has been added successfully", coupon })
+        const coupon = await Coupons.create({
+            code,
+            description,
+            active,
+            value,
+            multiple,
+            start_date,
+            end_date
+        })
+
+        response.json({ message: "The coupon has been added successfully", coupon })
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The coupons don't created" })
+    }
+
 };
 
-const updateCoupon =async (request, response) => {
+const updateCoupon = async (request, response) => {
     let couponId = request.params.id;
- 
+
     let {
         code,
         description,
@@ -73,7 +98,7 @@ const updateCoupon =async (request, response) => {
             where: {
                 id: couponId
             }
-        }); 
+        });
         const coupon = coupons[1][0].dataValues;
         response.json(coupon);
     } catch (error) {
@@ -85,11 +110,20 @@ const updateCoupon =async (request, response) => {
 
 const deleteCoupon = async (request, response) => {
     let couponId = request.params.id;
-    let coupon = await Coupons.destroy({where: {id: couponId}});
-    response.json({
-        message: "The coupon has been deleted succesfully",
-        coupon
-    });
+    try {
+        let coupon = await Coupons.destroy({ where: { id: couponId } });
+        response.json({
+            message: "The coupon has been deleted succesfully",
+            coupon
+        });
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "The coupon has not been deleted" })
+    }
+
 };
 
 

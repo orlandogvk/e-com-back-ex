@@ -121,6 +121,13 @@ const updatePassword = async(req, res) => {
     }
 };
 
+module.exports = {
+    login,
+    updatePassword,
+    logout,
+    resetPassword
+}
+
 
 /* const resetPassword = async (req, res) => {
 
