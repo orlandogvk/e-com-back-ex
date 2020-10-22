@@ -40,13 +40,10 @@ const findRoleById = async (request, response) => {
 };
 
 const addRole = async (request, response) => {
-
     let {
         name
     } = request.body;
-
     try {
-
         const role = await Roles.create({
             name
         })
@@ -58,7 +55,6 @@ const addRole = async (request, response) => {
             .status(400)
             .json({ message: "The role has been created" })
     }
-
 };
 
 const updateRole = async (request, response) => {
@@ -105,8 +101,6 @@ const deleteRole = async (request, response) => {
     }
 
 };
-
-
 
 // EXPORT
 module.exports = {

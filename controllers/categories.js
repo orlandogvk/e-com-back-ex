@@ -2,7 +2,7 @@
 const { Categories } = require('../models');
 
 
-const findCategory = async (request, response) => {
+/* const findCategory = async (request, response) => {
     try {
         const categories = await Categories.findAll({
             include: [{
@@ -15,6 +15,34 @@ const findCategory = async (request, response) => {
     catch (error) {
         console.log(error);
         response.status(400).json({ message: "Error to get the categories" });
+    }
+
+}; */
+
+const searchCategory = async (request, response) => {
+
+    try {
+        const limit = request.query.limit || 10;
+        const page = request.query.page || 1;
+
+        //Offset se refiere al numero de registros que excluiremos de la consulta
+        const categories = await Categories.findAndCountAll({
+            offset: limit * (page - 1),
+            limit: limit,
+        })
+
+        const pages = Math.ceil(categories.count / limit);
+
+        let nextPage = page < pages ? page + 1 : pages
+        let prevPage = page > 1 ? page - 1 : 1
+
+        response.json({ nextPage, prevPage, pages: pages, results: categories })
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "Error to find the page category" });
     }
 
 };
@@ -114,7 +142,8 @@ const deleteCategory = async (request, response) => {
 // EXPORT
 module.exports = {
     addCategory,
-    findCategory,
+    searchCategory,
+    // findCategory,
     findCatById,
     deleteCategory,
     updateCategory

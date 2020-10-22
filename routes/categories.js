@@ -1,22 +1,22 @@
 const express = require('express');
 const {addCategory,
-    findCategory,
+    searchCategory,
     findCatById,
     deleteCategory,
     updateCategory
     } = require('../controllers/categories');
 const router = express.Router();
-const validateToken = require('../middlewares/auth');
+const {validateToken,grantAccess} = require('../middlewares/auth');
 
 
 // POST
-router.post('/api/v1/categories', validateToken, addCategory);
+router.post('/api/v1/categories', addCategory);
 // GET
-router.get('/api/v1/categories', findCategory);
+router.get('/api/v1/categories',validateToken, grantAccess('readAny', 'Categories'), searchCategory);
 router.get('/api/v1/categories/:id', validateToken, findCatById);
 
 // DELETE
-router.delete('/api/v1/categories/:id', deleteCategory);
+router.delete('/api/v1/categories/:id',deleteCategory);
 // PUT
 router.put('/api/v1/categories/:id', updateCategory);
 // EXPORTAR

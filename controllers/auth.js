@@ -3,11 +3,15 @@ const Op = sequelize.Op;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('../middlewares/nodemailer');
-const {Users} = require('../models');
+const {Users,Roles} = require('../models');
 
 const login = async (request, response) => {
     const { email, password } = request.body;
     let user = await Users.findOne({
+        include: [{
+            model: Roles,
+            as: 'Roles'
+        }],
         where: {
             email: email
         }
@@ -26,13 +30,12 @@ const login = async (request, response) => {
                         id: user.id,
                         email: user.email,
                         first_name: user.first_name,
-                        last_name: user.last_name
+                        last_name: user.last_name,
+                        roles: user.roles
                     }, process.env.JWT_SECRET, { expiresIn: '1h' });
-                    response.cookie('access_token', 'Bearer ' + token, {
+                    response.cookie('access_token', token, {
                         expires: new Date(Date.now() + 1 * 3600000) // cookie will be removed after 1 hour
-                    })
-                    Users.update({token:token},{ where: {id:user.id}})
-                    response.json({ message: "You're login OK", token: token });
+                    }).json({ message: "You're login OK"});
                 }
             });
     } else {
@@ -125,7 +128,8 @@ module.exports = {
     login,
     updatePassword,
     logout,
-    resetPassword
+    resetPassword,
+    generateToken
 }
 
 

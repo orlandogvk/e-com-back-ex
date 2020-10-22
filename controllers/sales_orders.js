@@ -57,7 +57,7 @@ const findSale_OrderById = async (request, response) => {
 
 };
 
-const searchSalesOrderByPage = async (request, response) => {
+/* const searchSalesOrderByPage = async (request, response) => {
 
     try {
         const limit = request.query.limit;
@@ -84,7 +84,7 @@ const searchSalesOrderByPage = async (request, response) => {
     }
 
 };
-
+ */
 const addSale_Order = async (request, response) => {
 
     let {
@@ -175,7 +175,7 @@ module.exports = {
     addSale_Order,
     findSale_Order,
     findSale_OrderById,
-    searchSalesOrderByPage,
+    // searchSalesOrderByPage,
     deleteSale_Order,
     updateSale_Order
 }

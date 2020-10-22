@@ -1,20 +1,20 @@
 const express = require('express');
 
 const {addProduct,
-    findProduct,
+    searchProduct,
     findProductById,
     searchProductByPage,
     deleteProduct,
     updateProduct
     } = require('../controllers/products');
 const router = express.Router();
-const validateToken = require('../middlewares/auth');
+const {validateToken,grantAccess} = require('../middlewares/auth');
 
 
 // POST
 router.post('/api/v1/products', validateToken, addProduct);
 // GET
-router.get('/api/v1/products', findProduct);
+router.get('/api/v1/products',validateToken,grantAccess('readAny', 'Products'), searchProduct);
 router.get('/api/v1/products/search', searchProductByPage);
 router.get('/api/v1/products/:id', validateToken, findProductById);
 

@@ -2,7 +2,7 @@
 const {Products,Product_Statuses,Categories,Tags} = require('../models');
 
 
-const findProduct = async (request, response) => {
+/* const findProduct = async (request, response) => {
     try { 
         const products = await Products.findAll({
             include: [
@@ -32,7 +32,7 @@ const findProduct = async (request, response) => {
             .json({message: "Error to get the products"});
 
     }
-};  
+};  */ 
 
 const findProductById = async (request, response) => {
     try {
@@ -183,10 +183,58 @@ const deleteProduct = async (request, response) => {
    
 };
 
+const searchProduct = async (request, response) => {
+
+    try {
+        const limit = request.query.limit || 10;
+        const page = request.query.page || 1;
+
+        //Offset se refiere al numero de registros que excluiremos de la consulta
+        const products = await Products.findAndCountAll({
+            include: [
+                {
+                    model: Product_Statuses,
+                    as: 'Product_Statuses',
+                    // attributes: { exclude: ['id', 'createdAt', 'updatedAt'] }
+                    attributes: ['id', 'name']
+                },{
+                    model: Categories,
+                    as: 'Categories',
+                    attributes: ['id', 'name']
+                },{
+                    model: Tags,
+                    as: 'Tags',
+                    attributes: ['id', 'name']
+                }
+
+            ]
+        },
+        {
+            offset: limit * (page - 1),
+            limit: limit,
+        })
+
+        const pages = Math.ceil(products.count / limit);
+
+        let nextPage = page < pages ? page + 1 : pages
+        let prevPage = page > 1 ? page - 1 : 1
+
+        response.json({ nextPage, prevPage, pages: pages, results: products })
+
+    } catch (error) {
+        console.log(error);
+        response
+            .status(400)
+            .json({ message: "Error to find the page product" });
+    }
+
+};
+
 // EXPORT
 module.exports = {
     addProduct,
-    findProduct,
+    // findProduct,
+    searchProduct,
     findProductById,
     searchProductByPage,
     deleteProduct,
